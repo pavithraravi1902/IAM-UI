@@ -4,11 +4,13 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { ThemeProvider } from 'styled-components';
 import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from "react-query";
 import App from './components/app';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+const queryClient = new QueryClient();
 const theme = {
   colors: {
     primary: '#007bff',
@@ -24,7 +26,9 @@ root.render(
 <ThemeProvider theme={theme}>
   <React.StrictMode>
     <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
     <App />
+    </QueryClientProvider>
     </BrowserRouter>
   </React.StrictMode>
   </ThemeProvider>
