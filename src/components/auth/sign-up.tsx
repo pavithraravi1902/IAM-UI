@@ -52,7 +52,7 @@ const Signup = () => {
           <Typography
             color={"#191970"}
             variant="h5"
-            marginTop={15}
+            marginTop={5}
             fontWeight="bold"
             className="auth-welcome"
           >
@@ -126,6 +126,27 @@ const Signup = () => {
                     formik.errors.password}
                 </Grid>
                 <br />
+                {/* <Grid>
+                  <TextField
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    label="Confirm Password"
+                    variant="outlined"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.password}
+                    required
+                    helperText={
+                      formik.touched.password && !formik.values.password
+                        ? "Confirm Password mandatory"
+                        : ""
+                    }
+                  />
+                  {formik.errors.password &&
+                    formik.touched.password &&
+                    formik.errors.password}
+                </Grid>
+                <br /> */}
                 <Grid>
                   <Button
                     variant="contained"
@@ -133,28 +154,30 @@ const Signup = () => {
                     style={{ backgroundColor: "#191970" }}
                     disabled={formik.isSubmitting}
                   >
-                    Submit
+                    {t("Submit")}
                   </Button>
                   <NavLink to="/login" style={{ textDecoration: "none" }}>
-                    <Typography color={"#191970"}>login</Typography>
+                    <Typography color={"#191970"}>{t("login")}</Typography>
                   </NavLink>
                 </Grid>
-                <Grid><Typography>OR</Typography></Grid>
-                  <Grid>
-                    <LoginSocialGoogle
-                      client_id="1043116758259-0rjgl2irub8sempl72pl6t2fa766ftkq.apps.googleusercontent.com"
-                      access_type="offline"
-                      onResolve={({ provider, data }: IResolveParams) => {
-                        console.log(provider, 'Provider');
-                        console.log(data, "data")
-                      }}
-                      onReject={(err)=>{
-                        console.log(err)
-                      }}
-                      >
-                        Sign in with Google <Google></Google>
-                      </LoginSocialGoogle>
-                  </Grid>
+                <Grid>
+                  <Typography>{t("OR")}</Typography>
+                </Grid>
+                <Grid>
+                  <LoginSocialGoogle
+                    client_id="1043116758259-0rjgl2irub8sempl72pl6t2fa766ftkq.apps.googleusercontent.com"
+                    access_type="offline"
+                    onResolve={({ provider, data }: IResolveParams) => {
+                      console.log(provider, "Provider");
+                      console.log(data, "data");
+                    }}
+                    onReject={(err) => {
+                      console.log(err);
+                    }}
+                  >
+                    {t("Sign in with Google")} <Google></Google>
+                  </LoginSocialGoogle>
+                </Grid>
               </form>
             )}
           </Formik>

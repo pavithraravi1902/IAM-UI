@@ -4,17 +4,38 @@ import { Formik } from "formik";
 import { useTranslation } from "react-i18next";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Home } from "../common/home";
-import { getUserLogin } from "./auth-service";
+import { getUserLogin, sendMail } from "./auth-service";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import { IResolveParams, LoginSocialGoogle } from "reactjs-social-login";
 import { Google } from "@mui/icons-material";
+import axios from "axios";
 
 const Login = () => {
   const { t } = useTranslation();
   const [userData, setUserData] = useState<any>();
-  const [mfaValue, setMfaValue] = useState<any>();
+  const [mfaMail, setMfaMail] = useState<any>();
   const navigate = useNavigate();
+
+  const handleMFA = async (data: any) => {
+     setMfaMail(data);
+    // console.log(data, "handleMfaval");
+    try {
+      const response = await axios.post('http://localhost:3000/users/send-otp', { email: data });
+      console.log(response.data); 
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleMFAVerification = async (data: any) => {
+    try {
+      const response = await axios.post('http://localhost:3000/users/verify-otp', { email: mfaMail, otp: data });
+      console.log(response.data); 
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   const { isLoading: isUpdateLoading, mutate: getLoginUser } = useMutation<
     any,
@@ -36,15 +57,36 @@ const Login = () => {
     }
   );
 
-  const handleMFA = () => {
-
-  }
+  const { isLoading: isUpdateLoadings, mutate: sendEmail } = useMutation<
+    any,
+    Error
+  >(
+    async () => {
+      if (mfaMail) {
+        return await sendMail(mfaMail);
+      }else{
+        console.log("no mfa")
+      }
+    },
+    {
+      onSuccess: (res: any) => {
+        console.log(res)
+        console.log("mail sent successfully");
+      },
+      onError: (err: any) => {
+        console.log(err);
+      },
+    }
+  );
 
   useEffect(() => {
+    if(mfaMail){
+      sendEmail();
+    }
     if (userData) {
       getLoginUser();
     }
-  }, [userData]);
+  }, [userData, mfaMail]);
 
   return (
     <Grid container spacing={2} style={{ height: "100vh" }}>
@@ -80,7 +122,9 @@ const Login = () => {
                     label="email"
                     variant="outlined"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
+                    onBlur={(e)=>{
+                      handleMFA(e.target.value);
+                    }}
                     value={formik.values.email}
                     required
                     helperText={
@@ -97,7 +141,7 @@ const Login = () => {
                     name="password"
                     label="password"
                     variant="outlined"
-                    onChange={formik.handleChange}
+                    onChange={(formik.handleChange)}
                     onBlur={formik.handleBlur}
                     value={formik.values.password}
                     required
@@ -119,18 +163,17 @@ const Login = () => {
                     label="Multi factor auth code"
                     variant="outlined"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
+                    onBlur={(e)=>{
+                      handleMFAVerification(e.target.value);
+                    }}
                     value={formik.values.mfa}
-                    required
                     helperText={
                       formik.touched.mfa && !formik.values.mfa
                         ? "Enter the 6 digit MFA code"
                         : ""
                     }
                   />
-                  {formik.errors.mfa &&
-                    formik.touched.mfa &&
-                    formik.errors.mfa}
+                  {formik.errors.mfa && formik.touched.mfa && formik.errors.mfa}
                 </Grid>
                 <br />
                 <Grid>
@@ -140,37 +183,39 @@ const Login = () => {
                     style={{ backgroundColor: "#191970" }}
                     disabled={formik.isSubmitting}
                   >
-                    Submit
+                    {t("Submit")}
                   </Button>
                   <NavLink to="/sign-up" style={{ textDecoration: "none" }}>
                     <Button
                       variant="contained"
                       style={{ backgroundColor: "#191970" }}
                     >
-                      Sign in
+                      {t("Sign in")}
                     </Button>
                   </NavLink>
                   <NavLink
                     to="/forgot-password"
                     style={{ textDecoration: "none" }}
                   >
-                    <Typography color={"#191970"}>forgot password?</Typography>
+                    <Typography color={"#191970"}>{t("forgot password")}?</Typography>
                   </NavLink>
-                  <Grid><Typography>OR</Typography></Grid>
+                  <Grid>
+                    <Typography>{t("OR")}</Typography>
+                  </Grid>
                   <Grid>
                     <LoginSocialGoogle
                       client_id="1043116758259-0rjgl2irub8sempl72pl6t2fa766ftkq.apps.googleusercontent.com"
                       access_type="offline"
                       onResolve={({ provider, data }: IResolveParams) => {
-                        console.log(provider, 'Provider');
-                        console.log(data, "data")
+                        console.log(provider, "Provider");
+                        console.log(data, "data");
                       }}
-                      onReject={(err)=>{
-                        console.log(err)
+                      onReject={(err) => {
+                        console.log(err);
                       }}
-                      >
-                        Sign in with Google <Google></Google>
-                      </LoginSocialGoogle>
+                    >
+                      Sign in with Google <Google></Google>
+                    </LoginSocialGoogle>
                   </Grid>
                 </Grid>
               </form>

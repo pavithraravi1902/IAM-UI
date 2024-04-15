@@ -1,36 +1,32 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import reportWebVitals from './reportWebVitals';
-import { ThemeProvider } from 'styled-components';
-import { BrowserRouter } from 'react-router-dom';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import reportWebVitals from "./reportWebVitals";
+import { ThemeProvider } from "styled-components";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
-import App from './components/app';
+import App from "./components/app";
+import { I18nextProvider } from "react-i18next";
+import i18n from '../src/components/common/language/i18n';
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById("root") as HTMLElement
 );
 const queryClient = new QueryClient();
 const theme = {
   colors: {
-    primary: '#007bff',
-    secondary: '#6c757d',
-    background: '#f8f9fa',
+    primary: "#007bff",
+    secondary: "#6c757d",
+    background: "#f8f9fa",
   },
   fonts: {
-    primary: 'Arial, sans-serif',
+    primary: "Arial, sans-serif",
   },
 };
 
 root.render(
-<ThemeProvider theme={theme}>
-  <React.StrictMode>
-    <BrowserRouter>
-    <QueryClientProvider client={queryClient}>
-    <App />
-    </QueryClientProvider>
-    </BrowserRouter>
-  </React.StrictMode>
+  <ThemeProvider theme={theme}>
+    <BrowserRouter><QueryClientProvider client={queryClient}><I18nextProvider i18n={i18n}><App /></I18nextProvider></QueryClientProvider></BrowserRouter>
   </ThemeProvider>
 );
 

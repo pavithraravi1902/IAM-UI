@@ -6,10 +6,12 @@ import { useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { forgotPassword } from "./auth-service";
+import { useTranslation } from "react-i18next";
 
 const ForgotPassword = () => {
   const [emailData, setEmailData] = useState();
   const navigate = useNavigate();
+  const {t} = useTranslation();
 
   const { isLoading: isUpdateLoading, mutate: doForgotPassword } = useMutation<
     any,
@@ -54,7 +56,7 @@ const ForgotPassword = () => {
             {(formik: any) => (
               <form onSubmit={formik.handleSubmit}>
                 <Grid>
-                  <Typography>Forgot Password</Typography>
+                  <Typography>{t("forgot password")}</Typography>
                 </Grid>
                 <Grid>
                   <TextField
