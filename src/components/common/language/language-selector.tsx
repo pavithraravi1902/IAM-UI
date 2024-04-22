@@ -1,5 +1,4 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 const LanguageSelector = () => {
   const { i18n } = useTranslation();
@@ -10,8 +9,8 @@ const LanguageSelector = () => {
 
   return (
     <div>
-      <button onClick={() => changeLanguage('en')}>English</button>
-      <button onClick={() => changeLanguage('fr')}>French</button>
+      <button onClick={() => changeLanguage("en")}>English</button>
+      <button onClick={() => changeLanguage("fr")}>French</button>
     </div>
   );
 };

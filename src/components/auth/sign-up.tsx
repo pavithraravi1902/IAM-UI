@@ -1,14 +1,13 @@
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
-import { Home } from "../common/home";
-import { NavLink, useNavigate } from "react-router-dom";
-import { Formik } from "formik";
-import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
-import { useMutation } from "react-query";
-import { registerNewUser } from "./auth-service";
-import { create } from "domain";
-import { IResolveParams, LoginSocialGoogle } from "reactjs-social-login";
 import { Google } from "@mui/icons-material";
+import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import { Formik } from "formik";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useMutation } from "react-query";
+import { NavLink, useNavigate } from "react-router-dom";
+import { IResolveParams, LoginSocialGoogle } from "reactjs-social-login";
+import { Home } from "../common/home";
+import { registerNewUser } from "./auth-service";
 
 const Signup = () => {
   const { t } = useTranslation();

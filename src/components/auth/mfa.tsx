@@ -1,6 +1,6 @@
-import React from "react";
-import { MuiOtpInput } from "mui-one-time-password-input";
 import { Box, Button, Grid, Typography } from "@mui/material";
+import { MuiOtpInput } from "mui-one-time-password-input";
+import React from "react";
 
 export const MultiFactorAuthentication = () => {
   const [otp, setOtp] = React.useState("");

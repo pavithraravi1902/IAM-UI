@@ -1,13 +1,14 @@
 {
-    "AuthNexus": "AuthNexus",
-    "About Us": "À propos de nous",
-    "Log In": "Se connecter",
-    "User Login": "Utilisateur en ligne",
-    "Submit": "Soumettre",
-    "Sign in":"Se connecter",
-    "forgot password": "Mot de passe oublié",
-    "OR": "OU",
-    "Sign in with Google": "Connectez-vous avec Google",
-    "New User" : "Nouvel utilisateur",
-    "Features": "Caractéristiques"
-  }
+  "AuthNexus": "AuthNexus",
+  "About Us": "À propos de nous",
+  "Log In": "Se connecter",
+  "User Login": "Utilisateur en ligne",
+  "Submit": "Soumettre",
+  "Sign in": "Se connecter",
+  "forgot password": "Mot de passe oublié",
+  "OR": "OU",
+  "Sign in with Google": "Connectez-vous avec Google",
+  "New User": "Nouvel utilisateur",
+  "Features": "Caractéristiques",
+  "Save": "Sauvegarder"
+}

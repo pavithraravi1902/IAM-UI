@@ -1,39 +1,44 @@
+import { Google } from "@mui/icons-material";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
+import axios from "axios";
 import { Formik } from "formik";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useMutation } from "react-query";
 import { NavLink, useNavigate } from "react-router-dom";
+import { IResolveParams, LoginSocialGoogle } from "reactjs-social-login";
 import { Home } from "../common/home";
 import { getUserLogin, sendMail } from "./auth-service";
-import { useEffect, useState } from "react";
-import { useMutation, useQuery } from "react-query";
-import { IResolveParams, LoginSocialGoogle } from "reactjs-social-login";
-import { Google } from "@mui/icons-material";
-import axios from "axios";
 
 const Login = () => {
   const { t } = useTranslation();
   const [userData, setUserData] = useState<any>();
   const [mfaMail, setMfaMail] = useState<any>();
+  const [email, setEmail] = useState<any>();
+  const [password, setPassword] = useState<any>();
   const navigate = useNavigate();
 
   const handleMFA = async (data: any) => {
-     setMfaMail(data);
-    // console.log(data, "handleMfaval");
+    setMfaMail(data);
     try {
-      const response = await axios.post('http://localhost:3000/users/send-otp', { email: data });
-      console.log(response.data); 
+      const response = await axios.post(
+        "http://localhost:3000/users/send-otp",
+        { email: data }
+      );
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
 
   const handleMFAVerification = async (data: any) => {
     try {
-      const response = await axios.post('http://localhost:3000/users/verify-otp', { email: mfaMail, otp: data });
-      console.log(response.data); 
+      const response = await axios.post(
+        "http://localhost:3000/users/verify-otp",
+        { email: mfaMail, otp: data }
+      );
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
 
@@ -43,7 +48,10 @@ const Login = () => {
   >(
     async () => {
       if (userData) {
-        return await getUserLogin(userData);
+        const loginResponse = await getUserLogin(userData);
+      localStorage.setItem("email", userData.email);
+      localStorage.setItem("password", userData.password);
+      return loginResponse;
       }
     },
     {
@@ -64,13 +72,12 @@ const Login = () => {
     async () => {
       if (mfaMail) {
         return await sendMail(mfaMail);
-      }else{
-        console.log("no mfa")
+      } else {
+        console.log("no mfa");
       }
     },
     {
       onSuccess: (res: any) => {
-        console.log(res)
         console.log("mail sent successfully");
       },
       onError: (err: any) => {
@@ -80,7 +87,7 @@ const Login = () => {
   );
 
   useEffect(() => {
-    if(mfaMail){
+    if (mfaMail) {
       sendEmail();
     }
     if (userData) {
@@ -110,7 +117,6 @@ const Login = () => {
             initialValues={{ email: "", password: "" }}
             onSubmit={(data: any) => {
               setUserData(data);
-              // getUserLogin(data);
             }}
           >
             {(formik: any) => (
@@ -121,8 +127,9 @@ const Login = () => {
                     name="email"
                     label="email"
                     variant="outlined"
+                    inputRef={email}
                     onChange={formik.handleChange}
-                    onBlur={(e)=>{
+                    onBlur={(e) => {
                       handleMFA(e.target.value);
                     }}
                     value={formik.values.email}
@@ -141,7 +148,8 @@ const Login = () => {
                     name="password"
                     label="password"
                     variant="outlined"
-                    onChange={(formik.handleChange)}
+                    inputRef={password}
+                    onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.password}
                     required
@@ -163,7 +171,7 @@ const Login = () => {
                     label="Multi factor auth code"
                     variant="outlined"
                     onChange={formik.handleChange}
-                    onBlur={(e)=>{
+                    onBlur={(e) => {
                       handleMFAVerification(e.target.value);
                     }}
                     value={formik.values.mfa}
@@ -197,7 +205,9 @@ const Login = () => {
                     to="/forgot-password"
                     style={{ textDecoration: "none" }}
                   >
-                    <Typography color={"#191970"}>{t("forgot password")}?</Typography>
+                    <Typography color={"#191970"}>
+                      {t("forgot password")}?
+                    </Typography>
                   </NavLink>
                   <Grid>
                     <Typography>{t("OR")}</Typography>

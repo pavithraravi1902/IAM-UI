@@ -1,17 +1,16 @@
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
-import backgroundImage from "../../assets/auth1.jpeg";
 import { Formik } from "formik";
-import { Home } from "../common/home";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
+import { Home } from "../common/home";
 import { forgotPassword } from "./auth-service";
-import { useTranslation } from "react-i18next";
 
 const ForgotPassword = () => {
   const [emailData, setEmailData] = useState();
   const navigate = useNavigate();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const { isLoading: isUpdateLoading, mutate: doForgotPassword } = useMutation<
     any,
@@ -25,7 +24,6 @@ const ForgotPassword = () => {
     {
       onSuccess: (res: any) => {
         console.log("updated successfully");
-        //navigate("/dashboard");
       },
       onError: (err: any) => {
         console.log(err);
@@ -50,7 +48,6 @@ const ForgotPassword = () => {
             initialValues={{ email: "" }}
             onSubmit={(data: any) => {
               setEmailData(data);
-              console.log(data, "data");
             }}
           >
             {(formik: any) => (
