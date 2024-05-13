@@ -163,7 +163,7 @@ const Signup = () => {
                   <Typography>{t("OR")}</Typography>
                 </Grid>
                 <Grid>
-                  <LoginSocialGoogle
+                  {/* <LoginSocialGoogle
                     client_id="1043116758259-0rjgl2irub8sempl72pl6t2fa766ftkq.apps.googleusercontent.com"
                     access_type="offline"
                     onResolve={({ provider, data }: IResolveParams) => {
@@ -175,7 +175,7 @@ const Signup = () => {
                     }}
                   >
                     {t("Sign in with Google")} <Google></Google>
-                  </LoginSocialGoogle>
+                  </LoginSocialGoogle> */}
                 </Grid>
               </form>
             )}

@@ -9,6 +9,7 @@ import Dashboard from "../../dashboard/dashboard";
 import { Profile } from "../../profile-management/profile";
 import LoggedInHeader from "./loged-in-header";
 import LoggedOutHeader from "./logged-out-header";
+import PaymentComponent from "../../payment/payment";
 
 const MainPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -35,6 +36,7 @@ const MainPage = () => {
         <Route path="/dashboard" element={<Dashboard />}></Route>
         <Route path="/reset-password" element={<ResetPassword />}></Route>
         <Route path="/profile" element={<Profile />}></Route>
+        <Route path="/payment" element={<PaymentComponent/>}></Route>
       </Routes>
     </div>
   );
