@@ -1,11 +1,9 @@
-import { Google } from "@mui/icons-material";
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "react-query";
 import { NavLink, useNavigate } from "react-router-dom";
-import { IResolveParams, LoginSocialGoogle } from "reactjs-social-login";
 import { Home } from "../common/home";
 import { registerNewUser } from "./auth-service";
 
@@ -25,12 +23,16 @@ const Signup = () => {
     },
     {
       onSuccess: (res: any) => {
-        console.log(res, "response message");
+        console.log(res);
+        localStorage.setItem("newUser", "true");
+        localStorage.setItem("userId", res.user?.user?._id);
+        localStorage.setItem("username", res.user?.user?.username);
+        localStorage.setItem("email", res.user?.user?.email);
         console.log("updated successfully");
         navigate("/dashboard");
       },
       onError: (err: any) => {
-        console.log(err);
+        localStorage.setItem("newUser", "false");
       },
     }
   );

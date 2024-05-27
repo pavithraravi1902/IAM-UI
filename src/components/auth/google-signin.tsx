@@ -100,7 +100,6 @@
 //   }
 // }, [accessToken]);
 
-
 //   const handleFailure = (error: any) => {
 //     console.error("Google Sign-In failed:", error);
 //   };
@@ -133,6 +132,6 @@
 // };
 
 // export default GoogleSignIn;
-export const GoogleSignIn = ()=>{
-  return("Val")
-}
+export const GoogleSignIn = () => {
+  return "Val";
+};

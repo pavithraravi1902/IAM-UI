@@ -23,7 +23,6 @@ export const forgotPassword = async (email: any) => {
 };
 
 export const sendMail = async (email: any) => {
-  console.log("sendMail", email);
   const response = await apiClient.post<any>(`/users/send-otp`, email);
   console.log(response, "response");
   return response.data;

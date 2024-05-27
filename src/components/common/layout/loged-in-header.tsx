@@ -10,7 +10,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -20,7 +20,15 @@ const LoggedInHeader = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const [features, setFeatures] = useState<string[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const isLoggedInUser = localStorage.getItem('isLoggedIn');
+  const isNewUser = localStorage.getItem('newUser');
+  useEffect(() => {
+    if (isLoggedInUser || isNewUser) {
+      setIsLoggedIn(true);
+    }
+  }, [isLoggedInUser, isNewUser]);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLDivElement>) => {
     setMenuAnchor(event.currentTarget);
@@ -32,6 +40,13 @@ const LoggedInHeader = () => {
 
   const handleViewProfile = () => {
     navigate("/profile"); 
+    handleMenuClose();
+  };
+
+  const handleLogOut = () => {
+    localStorage.clear();
+    setIsLoggedIn(false);
+    navigate("/login"); 
     handleMenuClose();
   };
 
@@ -144,6 +159,7 @@ const LoggedInHeader = () => {
             </Typography>
           </MenuItem>
           <MenuItem onClick={handleViewProfile}>View Profile</MenuItem>
+          {isLoggedIn && <MenuItem onClick={handleLogOut}>Log Out</MenuItem>}
         </Menu>
       </Toolbar>
     </StyledAppBar>
@@ -151,3 +167,4 @@ const LoggedInHeader = () => {
 };
 
 export default LoggedInHeader;
+

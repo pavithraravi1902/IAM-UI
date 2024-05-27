@@ -1,46 +1,52 @@
 import { Google } from "@mui/icons-material";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Typography,
+} from "@mui/material";
 import Grid from "@mui/material/Grid";
 import axios from "axios";
 import { Formik } from "formik";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "react-query";
 import { NavLink, useNavigate } from "react-router-dom";
 import { IResolveParams, LoginSocialGoogle } from "reactjs-social-login";
 import { Home } from "../common/home";
-import { getUserLogin, sendMail } from "./auth-service";
+import { forgotPassword, getUserLogin, sendMail } from "./auth-service";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   const { t } = useTranslation();
   const [userData, setUserData] = useState<any>();
-  const [mfaMail, setMfaMail] = useState<any>();
   const [email, setEmail] = useState<any>();
   const [password, setPassword] = useState<any>();
+  const [showMFAField, setShowMFAField] = useState(false);
+  const [resendOtp, setResetOtp] = useState(false);
+  const [otpErrorMessage, setOtpErrorMessage] = useState("");
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const [isOtpSending, setIsOtpSending] = useState(false);
+  const [isOtpSent, setIsOtpSent] = useState(false);
   const navigate = useNavigate();
 
-  const handleMFA = async (data: any) => {
-    setMfaMail(data);
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/users/send-otp",
-        { email: data }
-      );
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  const handleMFAVerification = async (data: any) => {
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/users/verify-otp",
-        { email: mfaMail, otp: data }
-      );
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
+  const {
+    isLoading: isForgotPasswordLoading,
+    mutate: sendForgotPasswordEmail,
+  } = useMutation<any, Error>(forgotPassword, {
+    onSuccess: (res) => {
+      setOpenDialog(false);
+    },
+    onError: (err) => {
+      console.error("Error sending forgot password email:", err);
+    },
+  });
 
   const { isLoading: isUpdateLoading, mutate: getLoginUser } = useMutation<
     any,
@@ -49,51 +55,88 @@ const Login = () => {
     async () => {
       if (userData) {
         const loginResponse = await getUserLogin(userData);
-      localStorage.setItem("email", userData.email);
-      localStorage.setItem("password", userData.password);
-      return loginResponse;
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userId", loginResponse.user?.user?._id);
+        localStorage.setItem("email", loginResponse.user?.user?.email);
+        localStorage.setItem("password", loginResponse.user?.user?.password);
+        localStorage.setItem("username", loginResponse.user?.user?.username);
+        return loginResponse;
       }
     },
     {
       onSuccess: (res: any) => {
+        localStorage.setItem("isLoggedIn", "true");
         console.log("updated successfully");
         navigate("/dashboard");
       },
       onError: (err: any) => {
+        localStorage.setItem("isLoggedIn", "true");
         console.log(err);
       },
     }
   );
 
-  const { isLoading: isUpdateLoadings, mutate: sendEmail } = useMutation<
-    any,
-    Error
-  >(
-    async () => {
-      if (mfaMail) {
-        return await sendMail(mfaMail);
-      } else {
-        console.log("no mfa");
+  const handleMFAVerification = async (formik: any) => {
+    const email = formik.values.email;
+    const otp = formik.values.mfa;
+    try {
+      if (otp.length == 6) {
+        const response = await axios.post(
+          "http://localhost:3000/users/verify-otp",
+          { email: email, otp: otp }
+        );
+        setOtpErrorMessage("");
       }
-    },
-    {
-      onSuccess: (res: any) => {
-        console.log("mail sent successfully");
-      },
-      onError: (err: any) => {
-        console.log(err);
-      },
+    } catch (error) {
+      console.error("Error:", error);
+      setOtpErrorMessage("OTP verification failed. Please try again.");
     }
-  );
+  };
+
+  const handleSendOTP = async (formik: any) => {
+    const email = formik.values.email;
+    setShowMFAField(true);
+    setIsOtpSending(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/users/send-otp",
+        { email: email }
+      );
+      console.log("OTP Sent Successfully!");
+      setIsOtpSending(false);
+      setIsOtpSent(true);
+      setCountdown(60);
+    } catch (error) {
+      setIsOtpSending(false);
+      console.error("Error:", error);
+    }
+  };
+
+  const handleForgotPassword = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
 
   useEffect(() => {
-    if (mfaMail) {
-      sendEmail();
+    let timer: any;
+    if (countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prevCountdown) => prevCountdown - 1);
+      }, 1000);
+    } else if (countdown === 0) {
+      clearInterval(timer);
     }
+    return () => clearInterval(timer);
+  }, [countdown]);
+
+  useEffect(() => {
     if (userData) {
       getLoginUser();
     }
-  }, [userData, mfaMail]);
+  }, [userData]);
 
   return (
     <Grid container spacing={2} style={{ height: "100vh" }}>
@@ -127,11 +170,7 @@ const Login = () => {
                     name="email"
                     label="email"
                     variant="outlined"
-                    inputRef={email}
                     onChange={formik.handleChange}
-                    onBlur={(e) => {
-                      handleMFA(e.target.value);
-                    }}
                     value={formik.values.email}
                     required
                     helperText={
@@ -148,7 +187,6 @@ const Login = () => {
                     name="password"
                     label="password"
                     variant="outlined"
-                    inputRef={password}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.password}
@@ -170,9 +208,10 @@ const Login = () => {
                     name="mfa"
                     label="Multi factor auth code"
                     variant="outlined"
+                    disabled={!showMFAField}
                     onChange={formik.handleChange}
                     onBlur={(e) => {
-                      handleMFAVerification(e.target.value);
+                      handleMFAVerification(formik);
                     }}
                     value={formik.values.mfa}
                     helperText={
@@ -182,6 +221,21 @@ const Login = () => {
                     }
                   />
                   {formik.errors.mfa && formik.touched.mfa && formik.errors.mfa}
+                </Grid>
+                {otpErrorMessage && (
+                  <Typography color="error">{otpErrorMessage}</Typography>
+                )}
+                <Grid>
+                  <Button
+                    onClick={() => handleSendOTP(formik)}
+                    disabled={isOtpSending || countdown > 0}
+                  >
+                    {isOtpSending
+                      ? "Sending OTP..."
+                      : isOtpSent
+                      ? `Resend OTP (${countdown}s)`
+                      : "Send OTP"}
+                  </Button>
                 </Grid>
                 <br />
                 <Grid>
@@ -202,11 +256,12 @@ const Login = () => {
                     </Button>
                   </NavLink>
                   <NavLink
-                    to="/forgot-password"
+                    to="#"
+                    onClick={handleForgotPassword}
                     style={{ textDecoration: "none" }}
                   >
                     <Typography color={"#191970"}>
-                      {t("forgot password")}?
+                      {t("Forgot password")}?
                     </Typography>
                   </NavLink>
                   <Grid>
@@ -233,6 +288,40 @@ const Login = () => {
           </Formik>
         </Box>
       </Grid>
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>{t("Forgot Password")}</DialogTitle>
+        <DialogContent>
+          <Formik
+            initialValues={{ email: "" }}
+            onSubmit={(values: any) => {
+              sendForgotPasswordEmail(values);
+            }}
+          >
+            {(formik) => (
+              <form onSubmit={formik.handleSubmit}>
+                <TextField
+                  id="email"
+                  name="email"
+                  label="Email"
+                  variant="outlined"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.email}
+                  fullWidth
+                  margin="normal"
+                  required
+                />
+                <DialogActions>
+                  <Button onClick={handleCloseDialog}>{t("Cancel")}</Button>
+                  <Button type="submit" variant="contained" color="primary">
+                    {t("Submit")}
+                  </Button>
+                </DialogActions>
+              </form>
+            )}
+          </Formik>
+        </DialogContent>
+      </Dialog>
     </Grid>
   );
 };

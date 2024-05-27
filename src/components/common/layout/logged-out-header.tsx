@@ -133,26 +133,6 @@ const LoggedOutHeader = () => {
         >
           {t("Create an AuthNexus Account")}
         </Button>
-        <Grid onClick={handleMenuOpen}>
-          <Avatar alt="Profile Picture" src={profileImage || undefined} />
-        </Grid>
-        <Menu
-          anchorEl={menuAnchor}
-          open={Boolean(menuAnchor)}
-          onClose={handleMenuClose}
-          style={{ marginLeft: "1100px", marginTop: "40px" }}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-          transformOrigin={{ vertical: "top", horizontal: "right" }}
-        >
-          <MenuItem onClick={handleViewProfile}>
-            <Avatar alt="Profile Picture" />
-            <Typography variant="body1" sx={{ marginLeft: 1 }}>
-              {"username"}
-            </Typography>
-          </MenuItem>
-          <MenuItem onClick={handleViewProfile}>View Profile</MenuItem>
-          {/* Add more menu items for other actions */}
-        </Menu>
       </Toolbar>
     </StyledAppBar>
   );
