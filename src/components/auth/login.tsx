@@ -1,4 +1,4 @@
-import { Google } from "@mui/icons-material";
+import { Google, Visibility, VisibilityOff } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -6,44 +6,49 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
+  InputAdornment,
   TextField,
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import axios from "axios";
 import { Formik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "react-query";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { IResolveParams, LoginSocialGoogle } from "reactjs-social-login";
 import { Home } from "../common/home";
-import { forgotPassword, getUserLogin, sendMail } from "./auth-service";
+import { forgotPassword, getUserLogin } from "./auth-service";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   const { t } = useTranslation();
   const [userData, setUserData] = useState<any>();
-  const [email, setEmail] = useState<any>();
-  const [password, setPassword] = useState<any>();
   const [showMFAField, setShowMFAField] = useState(false);
-  const [resendOtp, setResetOtp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [otpErrorMessage, setOtpErrorMessage] = useState("");
-  const [openDialog, setOpenDialog] = React.useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [isOtpSending, setIsOtpSending] = useState(false);
   const [isOtpSent, setIsOtpSent] = useState(false);
+  const [TimeoutState, setTimeoutState] = useState<any>(null);
+  const [loginSession, setLoginSession] = useState<any>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const {
     isLoading: isForgotPasswordLoading,
     mutate: sendForgotPasswordEmail,
   } = useMutation<any, Error>(forgotPassword, {
     onSuccess: (res) => {
+      toast.success("Mail Sent!");
       setOpenDialog(false);
     },
     onError: (err) => {
+      toast.error("Failed to send mail");
       console.error("Error sending forgot password email:", err);
     },
   });
@@ -65,12 +70,22 @@ const Login = () => {
     },
     {
       onSuccess: (res: any) => {
-        localStorage.setItem("isLoggedIn", "true");
-        console.log("updated successfully");
-        navigate("/dashboard");
+        toast.success("Login Successfully!");
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1000);
+
+        // setTimeoutState(
+        //   setTimeout(() => {
+        //     console.log("Session has expired, Please login!")
+        //     toast.error("Session has expired, Please login!");
+        //     localStorage.clear();
+        //     navigate("/login");
+        //   }, 2 * 60 * 1000)
+        // );
       },
       onError: (err: any) => {
-        localStorage.setItem("isLoggedIn", "true");
+        toast.error("Failed to LogIn");
         console.log(err);
       },
     }
@@ -80,7 +95,7 @@ const Login = () => {
     const email = formik.values.email;
     const otp = formik.values.mfa;
     try {
-      if (otp.length == 6) {
+      if (otp.length === 6) {
         const response = await axios.post(
           "http://localhost:3000/users/verify-otp",
           { email: email, otp: otp }
@@ -91,6 +106,10 @@ const Login = () => {
       console.error("Error:", error);
       setOtpErrorMessage("OTP verification failed. Please try again.");
     }
+  };
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
   };
 
   const handleSendOTP = async (formik: any) => {
@@ -185,17 +204,31 @@ const Login = () => {
                   <TextField
                     id="password"
                     name="password"
-                    label="password"
+                    label="Password"
                     variant="outlined"
                     onChange={formik.handleChange}
+                    style={{ width: "55%" }}
                     onBlur={formik.handleBlur}
                     value={formik.values.password}
                     required
+                    type={showPassword ? "text" : "password"}
                     helperText={
                       formik.touched.password && !formik.values.password
                         ? "Password mandatory"
                         : ""
                     }
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={handleTogglePasswordVisibility}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                   {formik.errors.password &&
                     formik.touched.password &&
@@ -279,7 +312,7 @@ const Login = () => {
                         console.log(err);
                       }}
                     >
-                      Sign in with Google <Google></Google>
+                      Sign in with Google <Google />
                     </LoginSocialGoogle>
                   </Grid>
                 </Grid>
@@ -288,7 +321,13 @@ const Login = () => {
           </Formik>
         </Box>
       </Grid>
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
+      <Dialog
+        open={openDialog}
+        maxWidth="md"
+        fullWidth
+        sx={{ "& .MuiDialog-paper": { width: "600px", height: "200px" } }}
+        onClose={handleCloseDialog}
+      >
         <DialogTitle>{t("Forgot Password")}</DialogTitle>
         <DialogContent>
           <Formik
@@ -322,6 +361,7 @@ const Login = () => {
           </Formik>
         </DialogContent>
       </Dialog>
+      <ToastContainer />
     </Grid>
   );
 };

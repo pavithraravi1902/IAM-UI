@@ -10,21 +10,22 @@ import LoggedInHeader from "./loged-in-header";
 import LoggedOutHeader from "./logged-out-header";
 import PaymentComponent from "../../payment/payment";
 import RefundForm from "../../payment/refund";
+import { toast } from "react-toastify";
 
 const MainPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
   const checkLoginStatus = () => {
-    const isLoggedInUser = localStorage.getItem('isLoggedIn');
-    const isNewUser = localStorage.getItem('newUser');
+    const isLoggedInUser = localStorage.getItem("isLoggedIn");
+    const isNewUser = localStorage.getItem("newUser");
 
-    if (isLoggedInUser || isNewUser ) {
+    if (isLoggedInUser || isNewUser) {
       setIsLoggedIn(true);
-      console.log('Data from localStorage:', isLoggedInUser, isNewUser, );
+      console.log("Data from localStorage:", isLoggedInUser, isNewUser);
     } else {
       setIsLoggedIn(false);
-      console.log('Data not found in localStorage');
+      console.log("Data not found in localStorage");
     }
   };
 
@@ -33,13 +34,26 @@ const MainPage = () => {
     const handleStorageChange = () => {
       checkLoginStatus();
     };
-    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener("storage", handleStorageChange);
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
 
-  // Additional checks for login status before rendering routes
+  useEffect(() => {
+    let timeOut: any;
+    if (isLoggedIn) {
+      timeOut = setTimeout(() => {
+        toast.error("Session has expired, Please login!");
+        localStorage.clear();
+        navigate("/login");
+      }, 2 * 60 * 1000);
+    } else {
+      clearTimeout(timeOut);
+    }
+    return () => clearTimeout(timeOut);
+  }, [isLoggedIn, navigate]);
+
   useEffect(() => {
     checkLoginStatus();
   }, [navigate]);
@@ -63,4 +77,3 @@ const MainPage = () => {
 };
 
 export default MainPage;
-

@@ -22,14 +22,6 @@ const LoggedOutHeader = () => {
   const [features, setFeatures] = useState<string[]>([]);
   const navigate = useNavigate();
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // Same as before
-  };
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLDivElement>) => {
-    setMenuAnchor(event.currentTarget);
-  };
-
   const handleMenuClose = () => {
     setMenuAnchor(null);
   };
