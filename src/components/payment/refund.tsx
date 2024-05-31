@@ -1,18 +1,20 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import axios from "axios";
+import { useState } from "react";
 
 const RefundForm = () => {
-  const [paymentId, setPaymentId] = useState('');
-  const [amount, setAmount] = useState('');
-  const [reason, setReason] = useState('');
+  const [paymentId, setPaymentId] = useState("");
+  const [amount, setAmount] = useState("");
+  const [reason, setReason] = useState("");
   const [isPartial, setIsPartial] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   const handleRefund = async (e: any) => {
     e.preventDefault();
 
-    const endpoint = isPartial ? '/api/partial-refund' : '/api/refund';
-    const data = isPartial ? { paymentId, amount, reason } : { paymentId, reason };
+    const endpoint = isPartial ? "/api/partial-refund" : "/api/refund";
+    const data = isPartial
+      ? { paymentId, amount, reason }
+      : { paymentId, reason };
 
     try {
       const response = await axios.post(endpoint, data);
@@ -24,7 +26,7 @@ const RefundForm = () => {
 
   return (
     <div>
-      <h2>{isPartial ? 'Partial Refund' : 'Full Refund'}</h2>
+      <h2>{isPartial ? "Partial Refund" : "Full Refund"}</h2>
       <form onSubmit={handleRefund}>
         <div>
           <label>Payment ID:</label>

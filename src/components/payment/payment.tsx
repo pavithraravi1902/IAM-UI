@@ -1,4 +1,3 @@
-import React from "react";
 import { useFormik } from "formik";
 import useRazorpay, { RazorpayOptions } from "react-razorpay";
 import { createPaymentOrder, verifyPayment } from "./payment-service";
@@ -20,7 +19,7 @@ const PaymentComponent = () => {
           amount: values.amount,
           currency: values.currency,
           receipt: values.receipt,
-          userId: userId
+          userId: userId,
         });
         console.log(order, "ORDER");
         if (order?.result?.orderId) {

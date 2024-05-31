@@ -14,15 +14,15 @@ import {
 import Grid from "@mui/material/Grid";
 import axios from "axios";
 import { Formik } from "formik";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "react-query";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { IResolveParams, LoginSocialGoogle } from "reactjs-social-login";
 import { Home } from "../common/home";
 import { forgotPassword, getUserLogin } from "./auth-service";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   const { t } = useTranslation();
@@ -74,15 +74,6 @@ const Login = () => {
         setTimeout(() => {
           navigate("/dashboard");
         }, 1000);
-
-        // setTimeoutState(
-        //   setTimeout(() => {
-        //     console.log("Session has expired, Please login!")
-        //     toast.error("Session has expired, Please login!");
-        //     localStorage.clear();
-        //     navigate("/login");
-        //   }, 2 * 60 * 1000)
-        // );
       },
       onError: (err: any) => {
         toast.error("Failed to LogIn");

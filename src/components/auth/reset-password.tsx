@@ -1,12 +1,54 @@
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { Formik } from "formik";
 import { useTranslation } from "react-i18next";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams, useNavigate, useLocation } from "react-router-dom";
+import * as React from 'react';
+import CssBaseline from '@mui/material/CssBaseline';
+import Container from '@mui/material/Container';
+import { useState } from "react";
+
+const useQuery = () => {
+  const { search } = useLocation();
+  return new URLSearchParams(search);
+};
 
 const ResetPassword = () => {
   const { t } = useTranslation();
+  const query = useQuery();
+  const token = query.get('token');
+  const navigate = useNavigate();
+
+  const handleResetPassword = async (values: any, { setSubmitting }: any) => {
+    setSubmitting(true);
+    try {
+      const response = await fetch("http://localhost:3000/users/reset-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          token: token,
+          password: values.newPassword
+        })
+      });
+
+      if (response.ok) {
+        alert("Password reset successful!");
+        navigate("/login"); 
+      } else {
+        alert("Failed to reset password. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      alert("An error occurred. Please try again.");
+    }
+    setSubmitting(false);
+  };
   return (
-    <Grid container spacing={2} style={{ height: "80vh" }}>
+    <React.Fragment>
+      <CssBaseline />
+      <Container maxWidth="sm">
+      <Grid container spacing={2} style={{ height: "80vh" }}>
       <Grid item xs={12} spacing={2}>
         <Box height="15%">
           <Typography
@@ -22,11 +64,9 @@ const ResetPassword = () => {
         <Box height="55%">
           <Formik
             initialValues={{ newPassword: "" }}
-            onSubmit={(data: any) => {
-              console.log(data, "forgot password data");
-            }}
+            onSubmit={handleResetPassword}
           >
-            {(formik: any) => (
+            {(formik) => (
               <form onSubmit={formik.handleSubmit}>
                 <Grid>
                   <TextField
@@ -44,9 +84,9 @@ const ResetPassword = () => {
                         : ""
                     }
                   />
-                  {formik.errors.password &&
-                    formik.touched.password &&
-                    formik.errors.password}
+                  {formik.errors.newPassword &&
+                    formik.touched.newPassword &&
+                    formik.errors.newPassword}
                 </Grid>
                 <br />
                 <Grid>
@@ -58,21 +98,12 @@ const ResetPassword = () => {
                   >
                     Update
                   </Button>
-                  <NavLink to="/sign-up" style={{ textDecoration: "none" }}>
+                  <NavLink to="/login" style={{ textDecoration: "none" }}>
                     <Button
                       variant="contained"
-                      type="submit"
                       style={{ backgroundColor: "#191970" }}
                     >
                       Cancel
-                    </Button>
-                  </NavLink>
-                  <NavLink to="/sign-up" style={{ textDecoration: "none" }}>
-                    <Button
-                      variant="contained"
-                      style={{ backgroundColor: "#191970" }}
-                    >
-                      Sign in
                     </Button>
                   </NavLink>
                 </Grid>
@@ -82,6 +113,8 @@ const ResetPassword = () => {
         </Box>
       </Grid>
     </Grid>
+      </Container>
+    </React.Fragment>
   );
 };
 

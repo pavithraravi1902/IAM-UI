@@ -1,16 +1,14 @@
 import styled from "@emotion/styled";
 import {
   AppBar,
-  Avatar,
   Button,
-  Grid,
   Menu,
   MenuItem,
   Select,
   Toolbar,
-  Typography,
+  Typography
 } from "@mui/material";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 

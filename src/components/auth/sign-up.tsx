@@ -127,27 +127,6 @@ const Signup = () => {
                     formik.errors.password}
                 </Grid>
                 <br />
-                {/* <Grid>
-                  <TextField
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    label="Confirm Password"
-                    variant="outlined"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.password}
-                    required
-                    helperText={
-                      formik.touched.password && !formik.values.password
-                        ? "Confirm Password mandatory"
-                        : ""
-                    }
-                  />
-                  {formik.errors.password &&
-                    formik.touched.password &&
-                    formik.errors.password}
-                </Grid>
-                <br /> */}
                 <Grid>
                   <Button
                     variant="contained"

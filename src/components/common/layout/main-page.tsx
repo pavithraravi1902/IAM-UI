@@ -1,20 +1,26 @@
 import { useEffect, useState } from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import Login from "../../auth/login";
 import { MultiFactorAuthentication } from "../../auth/mfa";
 import ResetPassword from "../../auth/reset-password";
 import Signup from "../../auth/sign-up";
 import Dashboard from "../../dashboard/dashboard";
+import PaymentComponent from "../../payment/payment";
+import RefundForm from "../../payment/refund";
 import { Profile } from "../../profile-management/profile";
 import LoggedInHeader from "./loged-in-header";
 import LoggedOutHeader from "./logged-out-header";
-import PaymentComponent from "../../payment/payment";
-import RefundForm from "../../payment/refund";
-import { toast } from "react-toastify";
 
 const MainPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const hideHeaderPaths = ["/forgot-password", "/reset-password"];
+
+  const shouldHideHeader = hideHeaderPaths.some((path) =>
+    location.pathname.startsWith(path)
+  );
 
   const checkLoginStatus = () => {
     const isLoggedInUser = localStorage.getItem("isLoggedIn");
@@ -47,7 +53,7 @@ const MainPage = () => {
         toast.error("Session has expired, Please login!");
         localStorage.clear();
         navigate("/login");
-      }, 2 * 60 * 1000);
+      }, 15 * 60 * 1000);
     } else {
       clearTimeout(timeOut);
     }
@@ -60,7 +66,8 @@ const MainPage = () => {
 
   return (
     <div>
-      {isLoggedIn ? <LoggedInHeader /> : <LoggedOutHeader />}
+      {!shouldHideHeader &&
+        (isLoggedIn ? <LoggedInHeader /> : <LoggedOutHeader />)}
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />

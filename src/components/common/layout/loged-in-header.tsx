@@ -10,7 +10,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -22,8 +22,8 @@ const LoggedInHeader = () => {
   const [features, setFeatures] = useState<string[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
-  const isLoggedInUser = localStorage.getItem('isLoggedIn');
-  const isNewUser = localStorage.getItem('newUser');
+  const isLoggedInUser = localStorage.getItem("isLoggedIn");
+  const isNewUser = localStorage.getItem("newUser");
   useEffect(() => {
     if (isLoggedInUser || isNewUser) {
       setIsLoggedIn(true);
@@ -39,14 +39,14 @@ const LoggedInHeader = () => {
   };
 
   const handleViewProfile = () => {
-    navigate("/profile"); 
+    navigate("/profile");
     handleMenuClose();
   };
 
   const handleLogOut = () => {
     localStorage.clear();
     setIsLoggedIn(false);
-    navigate("/login"); 
+    navigate("/login");
     handleMenuClose();
   };
 
@@ -167,4 +167,3 @@ const LoggedInHeader = () => {
 };
 
 export default LoggedInHeader;
-
