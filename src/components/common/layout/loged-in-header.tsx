@@ -13,6 +13,8 @@ import {
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
+import UserProfileAPI from "../../profile-management/profile-service";
+import { toast } from "react-toastify";
 
 const LoggedInHeader = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("en");
@@ -21,14 +23,24 @@ const LoggedInHeader = () => {
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const [features, setFeatures] = useState<string[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate();
+  const [isDeactivate, setIsDeactivate] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const googleSignIn = localStorage.getItem("googleSignIn");
   const isLoggedInUser = localStorage.getItem("isLoggedIn");
   const isNewUser = localStorage.getItem("newUser");
+  const userId = localStorage.getItem("userId") || "";
+  const navigate = useNavigate();
+
+  const { useAddProfile, useUpdateProfile, useGetProfileById } =
+    UserProfileAPI();
+  const { mutate: updateProfile } : any = useUpdateProfile();
+  const { data: userProfile } = useGetProfileById(userId);
+
   useEffect(() => {
-    if (isLoggedInUser || isNewUser) {
+    if (isLoggedInUser || isNewUser || googleSignIn) {
       setIsLoggedIn(true);
     }
-  }, [isLoggedInUser, isNewUser]);
+  }, [isLoggedInUser, isNewUser, googleSignIn]);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLDivElement>) => {
     setMenuAnchor(event.currentTarget);
@@ -62,9 +74,58 @@ const LoggedInHeader = () => {
     console.log(fetchedFeatures);
   };
 
+  const handleSuccess = (response: any) => {
+    console.log(response);
+    toast.success("Profile Saved Successfully");
+  };
+
+  const handleError = (response: any) => {
+    console.log(response);
+    toast.error("Failed to save");
+  };
+
+  const handleDeactivate = (userProfile: any) => {
+    setIsDeactivate(true);
+    const status = {
+      profilePhoto: userProfile?.user?.profilePhoto,
+      userId: userProfile?.user?.userId,
+      firstName: userProfile?.user?.firstName,
+      lastName: userProfile?.user?.lastName,
+      dob: userProfile?.user?.dob,
+      mobileNumber: userProfile?.user?.mobileNumber,
+      email: userProfile?.user?.email,
+      isActive: true
+    }
+    updateProfile(status, {
+      onSuccess: handleSuccess,
+      onError: handleError,
+    });
+    console.log("handledeactivate");
+   // handleDeleteClick()
+  };
+
+  const handleDeleteClick = () => {
+    setShowConfirm(true);
+  };
+
+  const handleConfirm = () => {
+    console.log('Item deleted');
+    setShowConfirm(false);
+  };
+
+  const handleCancel = () => {
+    setShowConfirm(false);
+  };
+
   const StyledAppBar = styled(AppBar)`
     background-color: #191970;
   `;
+
+  useEffect(() => {
+    if(isDeactivate){
+      handleDeactivate(userProfile);
+    }
+  }, [userProfile, isDeactivate]);
 
   return (
     <StyledAppBar position="static">
@@ -159,6 +220,7 @@ const LoggedInHeader = () => {
             </Typography>
           </MenuItem>
           <MenuItem onClick={handleViewProfile}>View Profile</MenuItem>
+          <MenuItem onClick={handleDeactivate}>Deactivate</MenuItem>
           {isLoggedIn && <MenuItem onClick={handleLogOut}>Log Out</MenuItem>}
         </Menu>
       </Toolbar>

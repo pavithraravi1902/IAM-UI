@@ -6,6 +6,8 @@ import { useMutation } from "react-query";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Home } from "../common/home";
 import { registerNewUser } from "./auth-service";
+import { Google } from "@mui/icons-material";
+import { IResolveParams, LoginSocialGoogle } from "reactjs-social-login";
 
 const Signup = () => {
   const { t } = useTranslation();
@@ -144,19 +146,22 @@ const Signup = () => {
                   <Typography>{t("OR")}</Typography>
                 </Grid>
                 <Grid>
-                  {/* <LoginSocialGoogle
-                    client_id="1043116758259-0rjgl2irub8sempl72pl6t2fa766ftkq.apps.googleusercontent.com"
-                    access_type="offline"
-                    onResolve={({ provider, data }: IResolveParams) => {
-                      console.log(provider, "Provider");
-                      console.log(data, "data");
-                    }}
-                    onReject={(err) => {
-                      console.log(err);
-                    }}
-                  >
-                    {t("Sign in with Google")} <Google></Google>
-                  </LoginSocialGoogle> */}
+                <LoginSocialGoogle
+                      client_id="1043116758259-0rjgl2irub8sempl72pl6t2fa766ftkq.apps.googleusercontent.com"
+                      access_type="offline"
+                      onResolve={({ provider, data }: IResolveParams) => {
+                        console.log(provider, "Provider");
+                        console.log(data, "data");
+                        localStorage.setItem("googleSignIn", "true");
+                        window.location.href = "http://localhost:3001/dashboard";
+                      }}
+                      onReject={(err: any) => {
+                        localStorage.setItem("googleSignIn", "false");
+                        console.log(err);
+                      }}
+                    >
+                      Sign in with Google <Google />
+                    </LoginSocialGoogle>
                 </Grid>
               </form>
             )}

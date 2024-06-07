@@ -25,8 +25,9 @@ const MainPage = () => {
   const checkLoginStatus = () => {
     const isLoggedInUser = localStorage.getItem("isLoggedIn");
     const isNewUser = localStorage.getItem("newUser");
+    const googleSignIn = localStorage.getItem("googleSignIn")
 
-    if (isLoggedInUser || isNewUser) {
+    if (isLoggedInUser || isNewUser || googleSignIn) {
       setIsLoggedIn(true);
       console.log("Data from localStorage:", isLoggedInUser, isNewUser);
     } else {

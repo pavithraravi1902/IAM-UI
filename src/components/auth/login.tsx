@@ -298,6 +298,8 @@ const Login = () => {
                       onResolve={({ provider, data }: IResolveParams) => {
                         console.log(provider, "Provider");
                         console.log(data, "data");
+                        localStorage.setItem("googleSignIn", "true");
+                        window.location.href = "http://localhost:3001/dashboard";
                       }}
                       onReject={(err) => {
                         console.log(err);
