@@ -11,6 +11,8 @@ import RefundForm from "../../payment/refund";
 import { Profile } from "../../profile-management/profile";
 import LoggedInHeader from "./loged-in-header";
 import LoggedOutHeader from "./logged-out-header";
+import OTPVerification from "../../auth/otp-verification";
+import Callback from "../../auth/callback";
 
 const MainPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -21,18 +23,20 @@ const MainPage = () => {
   const shouldHideHeader = hideHeaderPaths.some((path) =>
     location.pathname.startsWith(path)
   );
-
   const checkLoginStatus = () => {
     const isLoggedInUser = localStorage.getItem("isLoggedIn");
     const isNewUser = localStorage.getItem("newUser");
     const googleSignIn = localStorage.getItem("googleSignIn")
-
+    const isDeactivate = localStorage.getItem("isDeactivate")
     if (isLoggedInUser || isNewUser || googleSignIn) {
       setIsLoggedIn(true);
       console.log("Data from localStorage:", isLoggedInUser, isNewUser);
     } else {
       setIsLoggedIn(false);
       console.log("Data not found in localStorage");
+    }
+    if(isDeactivate){
+      setIsLoggedIn(false);
     }
   };
 
@@ -54,7 +58,7 @@ const MainPage = () => {
         toast.error("Session has expired, Please login!");
         localStorage.clear();
         navigate("/login");
-      }, 15 * 60 * 1000);
+      }, 30 * 60 * 1000);
     } else {
       clearTimeout(timeOut);
     }
@@ -79,6 +83,8 @@ const MainPage = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/payment" element={<PaymentComponent />} />
         <Route path="/payment/refund" element={<RefundForm />} />
+        <Route  path="/mfa/otp" element={<OTPVerification />} />
+        <Route path="/callback" element={<Callback />} />
       </Routes>
     </div>
   );
